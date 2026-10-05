@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Faz a página se adaptar a celulares e outros dispositivos -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Calculadora</title>
+
+    <style>
+        /* ==============================
+           ESTILIZAÇÃO DA PÁGINA
+           ============================== */
+
+        /* Remove margens padrão e centraliza a calculadora */
+        body {
+            margin: 0;
+            height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background-color: #222;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Caixa principal da calculadora */
+        .calculadora {
+            width: 300px;
+            padding: 20px;
+
+            background-color: #333;
+            border-radius: 15px;
+
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Tela onde aparecem os números e resultados */
+        #tela {
+            width: 100%;
+            height: 60px;
+
+            margin-bottom: 15px;
+
+            box-sizing: border-box;
+
+            background-color: #111;
+            color: white;
+
+            border: none;
+            border-radius: 10px;
+
+            font-size: 28px;
+            text-align: right;
+
+            padding: 10px;
+        }
+
+        /* Área que contém os botões */
+        .botoes {
+            display: grid;
+
+            /* Quatro colunas de tamanho igual */
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 10px;
+        }
+
+        /* Estilo geral dos botões */
+        button {
+            height: 60px;
+
+            border: none;
+            border-radius: 10px;
+
+            font-size: 22px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            background-color: #555;
+            color: white;
+
+            transition: 0.2s;
+        }
+
+        /* Efeito quando o mouse passa sobre o botão */
+        button:hover {
+            background-color: #777;
+        }
+
+        /* Efeito quando o botão é pressionado */
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Cor diferente para os operadores */
+        .operador {
+            background-color: #ff9500;
+        }
+
+        .operador:hover {
+            background-color: #ffad33;
+        }
+
+        /* Botão de limpar */
+        .limpar {
+            background-color: #d9534f;
+        }
+
+        .limpar:hover {
+            background-color: #e57373;
+        }
+
+        /* Botão de resultado */
+        .igual {
+            background-color: #28a745;
+        }
+
+        .igual:hover {
+            background-color: #45c45a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==============================
+         CALCULADORA
+         ============================== -->
+
+    <div class="calculadora">
+
+        <!--
+            Tela da calculadora.
+            O JavaScript vai alterar o valor dela.
+        -->
+        <input type="text" id="tela" value="0" readonly>
+
+
+        <!-- Área dos botões -->
+        <div class="botoes">
+
+            <!-- Botão para limpar a calculadora -->
+            <button class="limpar" onclick="limpar()">C</button>
+
+            <!-- Botão de multiplicação -->
+            <button class="operador" onclick="operacao('*')">×</button>
+
+            <!-- Botão de soma -->
+            <button class="operador" onclick="operacao('+')">+</button>
+
+            <!-- Botão de resultado -->
+            <button class="igual" onclick="calcular()">=</button>
+
+
+            <!-- Números -->
+            <button onclick="numero(7)">7</button>
+            <button onclick="numero(8)">8</button>
+            <button onclick="numero(9)">9</button>
+
+            <button onclick="numero(4)">4</button>
+            <button onclick="numero(5)">5</button>
+            <button onclick="numero(6)">6</button>
+
+            <button onclick="numero(1)">1</button>
+            <button onclick="numero(2)">2</button>
+            <button onclick="numero(3)">3</button>
+
+            <!-- O botão 0 ocupa duas colunas -->
+            <button onclick="numero(0)" style="grid-column: span 2;">
+                0
+            </button>
+
+        </div>
+    </div>
+
+
+    <script>
+        /* ==============================
+           JAVASCRIPT DA CALCULADORA
+           ============================== */
+
+        // Pegamos a tela da calculadora pelo ID
+        const tela = document.getElementById("tela");
+
+
+        // Guarda o primeiro número digitado
+        let primeiroNumero = null;
+
+        // Guarda a operação escolhida (+ ou *)
+        let operador = null;
+
+        // Indica se estamos esperando o segundo número
+        let esperandoSegundoNumero = false;
+
+
+        /* =================================
+           FUNÇÃO PARA DIGITAR UM NÚMERO
+           ================================= */
+
+        function numero(valor) {
+
+            // Se estamos esperando o segundo número,
+            // começamos uma nova sequência de números.
+            if (esperandoSegundoNumero) {
+
+                tela.value = valor;
+
+                esperandoSegundoNumero = false;
+
+            } else {
+
+                // Se a tela estiver mostrando apenas 0,
+                // substituímos o 0 pelo número digitado.
+                if (tela.value === "0") {
+
+                    tela.value = valor;
+
+                } else {
+
+                    // Caso contrário, adicionamos o número
+                    // ao que já está na tela.
+                    tela.value += valor;
+                }
+            }
+        }
+
+
+        /* =================================
+           FUNÇÃO PARA ESCOLHER A OPERAÇÃO
+           ================================= */
+
+        function operacao(tipo) {
+
+            // Guarda o número que está na tela.
+            primeiroNumero = Number(tela.value);
+
+            // Guarda a operação escolhida.
+            operador = tipo;
+
+            // Agora o próximo número digitado será
+            // o segundo número da conta.
+            esperandoSegundoNumero = true;
+        }
+
+
+        /* =================================
+           FUNÇÃO PARA CALCULAR O RESULTADO
+           ================================= */
+
+        function calcular() {
+
+            // Se não houver primeiro número ou operador,
+            // não fazemos nada.
+            if (primeiroNumero === null || operador === null) {
+                return;
+            }
+
+            // Pegamos o segundo número da tela.
+            const segundoNumero = Number(tela.value);
+
+            // Variável que receberá o resultado.
+            let resultado;
+
+
+            // Verificamos qual operação foi escolhida.
+            if (operador === "+") {
+
+                // Soma
+                resultado = primeiroNumero + segundoNumero;
+
+            } else if (operador === "*") {
+
+                // Multiplicação
+                resultado = primeiroNumero * segundoNumero;
+            }
+
+
+            // Mostramos o resultado na tela.
+            tela.value = resultado;
+
+
+            // Limpamos os valores anteriores
+            // para permitir uma nova operação.
+            primeiroNumero = null;
+            operador = null;
+            esperandoSegundoNumero = true;
+        }
+
+
+        /* =================================
+           FUNÇÃO PARA LIMPAR A CALCULADORA
+           ================================= */
+
+        function limpar() {
+
+            // Volta a tela para zero.
+            tela.value = "0";
+
+            // Apaga o primeiro número.
+            primeiroNumero = null;
+
+            // Apaga a operação.
+            operador = null;
+
+            // Permite começar uma nova conta.
+            esperandoSegundoNumero = false;
+        }
+    </script>
+
+</body>
+
+</html>
